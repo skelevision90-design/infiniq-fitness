@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-black: #07090C;
+    --text-100: #FFFFFF;
+    --text-70: rgba(255, 255, 255, 0.70);
+    --text-45: rgba(255, 255, 255, 0.45);
+    --hairline: rgba(255, 255, 255, 0.12);
+    --blue-primary: #27D0FF;
+    --blue-deep: #0B8FCF;
+    --blue-tint: rgba(39, 208, 255, 0.08);
+    --error-red: #FF6B6B;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+    background-color: #07090C;
+  }
+
+  body {
+    background-color: #07090C;
+    color: rgba(255, 255, 255, 0.70);
+    font-family: var(--font-hanken), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-weight: 300;
+    letter-spacing: -0.015em;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: rgba(39, 208, 255, 0.25);
+    color: #FFFFFF;
+  }
+}
+
+/* Custom quiet luxury photo treatment: dark, desaturated, soft grain */
+.photo-luxury {
+  filter: grayscale(100%) brightness(0.68) contrast(1.08);
+  transition: filter 400ms ease;
+}
+
+/* 12% subtle cool blue-black tint overlay on hero photo */
+.hero-tint-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(7, 9, 12, 0.75) 0%,
+    rgba(11, 25, 34, 0.35) 45%,
+    rgba(7, 9, 12, 0.92) 100%
+  );
+  mix-blend-mode: multiply;
+}
+
+/* Soft film grain overlay */
+.grain-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Pulse animation for 6px blue indicator dot */
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.85);
+  }
+}
+
+.animate-subtle-pulse {
+  animation: subtle-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Hero load fade-in (pure CSS, no libraries) */
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-hero-fade {
+  animation: hero-fade 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scroll reveal helper */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 700ms cubic-bezier(0.16, 1, 0.3, 1), transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-item.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal-item {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

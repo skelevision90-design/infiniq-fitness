@@ -1,0 +1,54 @@
+import { env } from './env';
+
+interface TurnstileVerifyResponse {
+  success: boolean;
+  'error-codes'?: string[];
+  challenge_ts?: string;
+  hostname?: string;
+}
+
+/**
+ * Verifies a Cloudflare Turnstile token server-side.
+ * Fails closed if token is invalid or request fails.
+ */
+export async function verifyTurnstileToken(token: string, remoteIp?: string): Promise<boolean> {
+  // If no token provided, fail immediately
+  if (!token || typeof token !== 'string') {
+    return false;
+  }
+
+  // Cloudflare documented test secret: '1x0000000000000000000000000000000AA' always passes
+  // We make the official POST request to Cloudflare siteverify endpoint:
+  try {
+    const formData = new URLSearchParams();
+    formData.append('secret', env.TURNSTILE_SECRET_KEY);
+    formData.append('response', token);
+    if (remoteIp) {
+      formData.append('remoteip', remoteIp);
+    }
+
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+
+    if (!res.ok) {
+      console.error(`Turnstile verification HTTP error: ${res.status}`);
+      return false; // Fail closed
+    }
+
+    const data = (await res.json()) as TurnstileVerifyResponse;
+    if (!data.success) {
+      console.warn('Turnstile verification failed with error codes:', data['error-codes']);
+      return false; // Fail closed
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Turnstile verification exception:', error);
+    return false; // Fail closed on network or system exceptions
+  }
+}
