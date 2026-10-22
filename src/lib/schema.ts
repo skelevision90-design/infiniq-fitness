@@ -11,7 +11,7 @@ export const GOAL_OPTIONS = [
 
 export type GoalOption = (typeof GOAL_OPTIONS)[number];
 
-// Regular expression for allowed name characters: English letters, spaces, apostrophes, periods, hyphens
+// Allowed name characters: letters, spaces, apostrophes, periods, hyphens
 const NAME_REGEX = /^[A-Za-z\s.'-]+$/;
 
 /**
@@ -48,7 +48,10 @@ export const preRegisterInputSchema = z
       .trim()
       .min(2, 'Name must be at least 2 characters')
       .max(60, 'Name must not exceed 60 characters')
-      .regex(NAME_REGEX, 'Name may only contain letters, spaces, dots, apostrophes, and hyphens'),
+      .regex(NAME_REGEX, 'Name may only contain letters, spaces, dots, apostrophes, and hyphens')
+      .refine((val) => /[A-Za-z]/.test(val), {
+        message: 'Name must contain at least one letter',
+      }),
     
     phone: z
       .string({ required_error: 'Phone number is required' })
@@ -69,7 +72,7 @@ export const preRegisterInputSchema = z
       errorMap: () => ({ message: 'Please select a valid fitness goal' }),
     }),
 
-    // Honeypot field - must be empty
+    // Honeypot field - must be empty string
     website: z.string().max(0, 'Spam detected').optional().default(''),
 
     // Minimum time-to-submit check (rendered timestamp)
@@ -78,7 +81,7 @@ export const preRegisterInputSchema = z
       .refine(
         (ts) => {
           const elapsed = Date.now() - ts;
-          // Must take at least 3000ms (3 seconds) to submit and not be from the future (> 5s)
+          // Must take at least 3000ms (3 seconds) to submit and not be from the future
           return elapsed >= 3000 && elapsed <= 24 * 60 * 60 * 1000;
         },
         { message: 'Submission completed too quickly. Please take a moment to review.' }

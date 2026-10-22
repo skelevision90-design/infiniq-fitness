@@ -99,6 +99,8 @@ export function PreRegisterSection() {
       errors.name = 'Name cannot exceed 60 characters.';
     } else if (!/^[A-Za-z\s.'-]+$/.test(name.trim())) {
       errors.name = 'Name may only contain letters, spaces, dots, and hyphens.';
+    } else if (!/[A-Za-z]/.test(name.trim())) {
+      errors.name = 'Name must contain at least one letter.';
     }
 
     if (!phone.trim()) {
@@ -184,7 +186,10 @@ export function PreRegisterSection() {
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-12">
           {/* Left Column: Heading & Quiet Luxury Founding Invitation */}
           <div className="lg:col-span-5">
-            <h2 className="text-3xl font-light tracking-[-0.03em] text-white sm:text-4xl md:text-5xl leading-[1.12]">
+            <span className="text-xs font-light tracking-widest text-white/45">
+              FOUNDING MEMBERSHIP
+            </span>
+            <h2 className="mt-4 text-3xl font-light tracking-[-0.03em] text-white sm:text-4xl md:text-5xl leading-[1.12]">
               Be a founding member. Hear about launch offers before anyone else.
             </h2>
             <p className="mt-6 max-w-md text-sm font-light leading-relaxed text-white/70">
@@ -321,34 +326,42 @@ export function PreRegisterSection() {
                   >
                     PRIMARY DISCIPLINE
                   </label>
-                  <select
-                    id="goal"
-                    name="goal"
-                    required
-                    value={goal}
-                    onChange={(e) => {
-                      setGoal(e.target.value);
-                      if (fieldErrors.goal) {
-                        setFieldErrors((prev) => ({ ...prev, goal: undefined }));
-                      }
-                    }}
-                    className={`mt-2 w-full appearance-none border-b bg-transparent pb-3 pt-1 text-base font-light text-white transition-colors duration-200 focus:outline-none caret-[#27D0FF] cursor-pointer ${
-                      !goal ? 'text-white/40' : 'text-white'
-                    } ${
-                      fieldErrors.goal
-                        ? 'border-[#FF6B6B]'
-                        : 'border-white/[0.12] focus:border-[#27D0FF]'
-                    }`}
-                  >
-                    <option value="" disabled className="bg-[#07090C] text-white/40">
-                      Select primary discipline
-                    </option>
-                    {GOAL_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt} className="bg-[#07090C] text-white">
-                        {opt}
+                  <div className="relative">
+                    <select
+                      id="goal"
+                      name="goal"
+                      required
+                      value={goal}
+                      onChange={(e) => {
+                        setGoal(e.target.value);
+                        if (fieldErrors.goal) {
+                          setFieldErrors((prev) => ({ ...prev, goal: undefined }));
+                        }
+                      }}
+                      className={`mt-2 w-full appearance-none border-b bg-transparent pb-3 pt-1 pr-8 text-base font-light text-white transition-colors duration-200 focus:outline-none caret-[#27D0FF] cursor-pointer ${
+                        !goal ? 'text-white/40' : 'text-white'
+                      } ${
+                        fieldErrors.goal
+                          ? 'border-[#FF6B6B]'
+                          : 'border-white/[0.12] focus:border-[#27D0FF]'
+                      }`}
+                    >
+                      <option value="" disabled className="bg-[#07090C] text-white/40">
+                        Select primary discipline
                       </option>
-                    ))}
-                  </select>
+                      {GOAL_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt} className="bg-[#07090C] text-white">
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                    {/* Delicate Chevron Icon */}
+                    <div className="pointer-events-none absolute right-1 bottom-4 text-white/40">
+                      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+                        <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                  </div>
                   {fieldErrors.goal && (
                     <p role="alert" className="mt-2 text-xs font-light text-[#FF6B6B]">
                       {fieldErrors.goal}

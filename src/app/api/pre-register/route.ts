@@ -81,13 +81,15 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4. Origin & Host verification (Strict anti-CSRF check)
+    // 4. Origin & Referer verification (Strict anti-CSRF check)
     const origin = req.headers.get('origin');
+    const referer = req.headers.get('referer');
     const host = req.headers.get('host');
-    if (origin) {
+    const checkTarget = origin || (referer ? new URL(referer).origin : null);
+
+    if (checkTarget) {
       try {
-        const originUrl = new URL(origin);
-        // Allow origin if hostname matches host header or configured site URL
+        const originUrl = new URL(checkTarget);
         const siteUrlObj = new URL(env.NEXT_PUBLIC_SITE_URL);
         const matchesHost = host && originUrl.host === host;
         const matchesConfigured = originUrl.host === siteUrlObj.host;
@@ -146,8 +148,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 8. Log the validated lead to console (No secrets logged)
-    // Mask middle digits of phone for privacy in logs: e.g. 98153*****
+    // 8. Log the validated lead to console (No secrets logged, phone masked)
     const maskedPhone = `${phone.slice(0, 5)}*****`;
     console.info(`[INFINIQ LEAD] New pre-registration received:`, {
       name,
@@ -159,13 +160,7 @@ export async function POST(req: Request) {
 
     /**
      * PRODUCTION INTEGRATION TODO:
-     * 1. Dispatch email notification to team via Resend:
-     *    await resend.emails.send({
-     *      from: 'INFINIQ Concierge <concierge@infiniqfitness.com>',
-     *      to: 'membership@infiniqfitness.com',
-     *      subject: `New Founding Member: ${name}`,
-     *      text: `Name: ${name}\nPhone: +91 ${phone}\nGoal: ${goal}`
-     *    });
+     * 1. Dispatch email notification to team via Resend.
      * 2. Append lead row to Google Sheets via Google Sheets API or Webhook.
      * 3. Sync into CRM / WhatsApp Business API.
      */

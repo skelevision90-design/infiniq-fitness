@@ -88,19 +88,19 @@ export function ClubSection() {
             {SPACES.map((space) => (
               <div
                 key={space.num}
-                className="group border-b border-white/[0.12] py-6 transition-colors duration-200"
+                className="group flex items-center justify-between border-b border-white/[0.12] py-5 transition-colors duration-200"
               >
-                <div className="flex items-baseline justify-between">
-                  <h3 className="text-lg font-light text-white transition-colors duration-200 group-hover:text-[#27D0FF]">
-                    {space.name}
-                  </h3>
+                <div className="flex items-baseline gap-4">
                   <span className="text-xs font-light tracking-wider text-white/45">
                     {space.num}
                   </span>
+                  <h3 className="text-base sm:text-lg font-light text-white transition-colors duration-200 group-hover:text-[#27D0FF]">
+                    {space.name}
+                  </h3>
                 </div>
-                <p className="mt-2 text-xs font-light leading-relaxed text-white/70">
+                <span className="hidden sm:inline-block text-xs font-light text-white/45 text-right max-w-[200px] lg:max-w-xs truncate">
                   {space.desc}
-                </p>
+                </span>
               </div>
             ))}
           </div>

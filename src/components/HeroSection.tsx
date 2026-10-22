@@ -39,6 +39,9 @@ export function HeroSection() {
 
       {/* Hero Bottom-Left Typography Block */}
       <div className="relative z-10 mt-auto max-w-3xl animate-hero-fade">
+        {/* Short 48px Signature Blue Line above section heading */}
+        <div className="mb-6 h-[1.5px] w-12 bg-[#27D0FF]" aria-hidden="true" />
+
         {/* Pulsing 6px Blue Indicator Dot before 'Pre-registrations open' */}
         <div className="mb-5 flex items-center gap-2.5">
           <span
