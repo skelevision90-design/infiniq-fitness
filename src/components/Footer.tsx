@@ -52,7 +52,7 @@ export function Footer() {
             </div>
 
             <p className="text-xs font-light text-white/45">
-              &copy; {new Date().getFullYear()} INFINIQ Fitness Club. All rights reserved.
+              &copy; 2026 INFINIQ Fitness Club. All rights reserved.
             </p>
           </div>
         </div>

@@ -78,12 +78,16 @@ export function PreRegisterSection() {
       }
     };
 
+    let attempts = 0;
     const interval = setInterval(() => {
+      attempts++;
       if (window.turnstile && turnstileContainerRef.current) {
         checkAndRender();
         clearInterval(interval);
+      } else if (attempts > 15) {
+        clearInterval(interval);
       }
-    }, 400);
+    }, 300);
 
     return () => clearInterval(interval);
   }, []);

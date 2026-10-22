@@ -36,13 +36,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={hanken.variable}>
-      <head>
+      <body className="min-h-screen bg-[#07090C] text-white/70 antialiased selection:bg-[#27D0FF]/20 selection:text-white">
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
           strategy="afterInteractive"
         />
-      </head>
-      <body className="min-h-screen bg-[#07090C] text-white/70 antialiased selection:bg-[#27D0FF]/20 selection:text-white">
         {children}
       </body>
     </html>

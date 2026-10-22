@@ -9,10 +9,10 @@ const MAX_BODY_BYTES = 2048; // Strict 2KB limit
 function getClientIp(req: Request): string {
   const forwardedFor = req.headers.get('x-forwarded-for');
   if (forwardedFor) {
-    const ips = forwardedFor.split(',').map((ip) => ip.trim());
-    return ips[0] || '127.0.0.1';
+    const firstIp = forwardedFor.split(',')[0]?.trim();
+    if (firstIp) return firstIp;
   }
-  return req.headers.get('x-real-ip') || '127.0.0.1';
+  return req.headers.get('x-real-ip')?.trim() || '127.0.0.1';
 }
 
 function methodNotAllowedResponse() {
@@ -42,6 +42,19 @@ export async function DELETE() {
 
 export async function PATCH() {
   return methodNotAllowedResponse();
+}
+
+export async function HEAD() {
+  return methodNotAllowedResponse();
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      Allow: 'POST',
+    },
+  });
 }
 
 export async function POST(req: Request) {
@@ -85,7 +98,18 @@ export async function POST(req: Request) {
     const origin = req.headers.get('origin');
     const referer = req.headers.get('referer');
     const host = req.headers.get('host');
-    const checkTarget = origin || (referer ? new URL(referer).origin : null);
+
+    let checkTarget: string | null = origin;
+    if (!checkTarget && referer) {
+      try {
+        checkTarget = new URL(referer).origin;
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid referer header.' },
+          { status: 403 }
+        );
+      }
+    }
 
     if (checkTarget) {
       try {
@@ -108,8 +132,17 @@ export async function POST(req: Request) {
       }
     }
 
-    // 5. Read body text and check length before JSON parsing
-    const rawText = await req.text();
+    // 5. Read body text safely and verify byte length
+    let rawText: string;
+    try {
+      rawText = await req.text();
+    } catch {
+      return NextResponse.json(
+        { error: 'Unable to read request payload.' },
+        { status: 400 }
+      );
+    }
+
     if (new TextEncoder().encode(rawText).length > MAX_BODY_BYTES) {
       return NextResponse.json(
         { error: 'Request payload too large.' },
@@ -148,14 +181,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // 8. Log the validated lead to console (No secrets logged, phone masked)
+    // 8. Safely log validated lead for demo
     const maskedPhone = `${phone.slice(0, 5)}*****`;
-    console.info(`[INFINIQ LEAD] New pre-registration received:`, {
+    console.info('[INFINIQ LEAD]', {
       name,
       phone: maskedPhone,
       goal,
       timestamp: new Date().toISOString(),
-      ip: clientIp,
     });
 
     /**
@@ -178,9 +210,8 @@ export async function POST(req: Request) {
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     // Generic error message - never leak stack trace or internal error
-    console.error('Unhandled pre-registration error:', error);
     return NextResponse.json(
       { error: 'An unexpected error occurred. Please try again shortly.' },
       { status: 500 }

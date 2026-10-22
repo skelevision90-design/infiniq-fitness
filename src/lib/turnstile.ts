@@ -42,19 +42,16 @@ export async function verifyTurnstileToken(token: string, remoteIp?: string): Pr
     });
 
     if (!res.ok) {
-      console.error(`Turnstile verification HTTP error: ${res.status}`);
       return false; // Fail closed
     }
 
     const data = (await res.json()) as TurnstileVerifyResponse;
     if (!data.success) {
-      console.warn('Turnstile verification failed with error codes:', data['error-codes']);
       return false; // Fail closed
     }
 
     return true;
-  } catch (error) {
-    console.error('Turnstile verification exception:', error);
+  } catch {
     return false; // Fail closed on network or system exceptions
   }
 }
